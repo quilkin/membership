@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    },
+  //   { 
+  //     "path": "../ridehub-common",
+  //     // add 'prepend' if you want to include the referenced project in your output file
+  //     //"prepend": true, 
+  // }
+  ],
+}

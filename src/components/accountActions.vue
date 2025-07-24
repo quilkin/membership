@@ -4,7 +4,6 @@
  * Controlling the four sub-views under ./account
  */
 import { ref, onMounted, onUpdated } from 'vue'
-import signup from './account/Signup.vue'
 import login from './account/login.vue'
 import account from './account/account.vue'
 import reqpass from './account/reqpassword.vue'
@@ -134,9 +133,7 @@ function guest() {
     <reqpass v-else-if="status===Status.reqPassword"
             @done-pass="status=Status.loggingIn"
     ></reqpass>
-    <signup v-else-if="status===Status.signingUp"
-            @done-sign-up="status=Status.loggingIn"
-    ></signup>
+
     <account v-else
             :user="currentUser"
             @done-account="doneAccount"

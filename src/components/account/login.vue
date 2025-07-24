@@ -71,14 +71,6 @@ async function submit() {
 }
 
 
-function signup() {
-  emit('signUp');
-
-}
-function guest() {
-  emit('guestVisit');
-
-}
 function forgot() {
   emit("forgotPass");
 
@@ -95,6 +87,7 @@ function forgot() {
     <v-card-title class="headline black" primary-title>
       Sign in to TCC membership database
     </v-card-title>
+    <v-card-text> Same username and password as used for RideHub</v-card-text>
     <v-card-text class="pa-2">
       <v-form @submit.prevent="submit" ref="loginForm">
         <v-text-field v-model="userOrEmail"  :rules="nameRules" autocapitalize="off"

@@ -46,7 +46,7 @@
  function sendEmail() {
   window.open('mailto:' + member.email)
  }
- function whatsApp() {
+ function whatsAppList() {
   let waString = '';
   if (member.waInfo>0) waString += 'Info, ';
   if (member.waChat>0) waString += 'Chat, ';
@@ -54,7 +54,12 @@
   if (waString.length == 0)
     waString = 'None';
   return waString;
+ }
 
+ function committeeList() {
+  if (member.commArray != undefined)
+    return member.committee;
+  return 'no';
  }
 </script>
 
@@ -72,12 +77,8 @@
         content-class="details-dialog"
       >
       <v-card :title="fullName(member)" max-width="550">
-        <v-card-text>    {{ member.address1 }} {{ member.address2 }} {{ member.address3}} {{ member.postcode }}   </v-card-text>
+        <v-card-text  class="mt-3">    {{ member.address1 }} {{ member.address2 }} {{ member.address3}} {{ member.postcode }}   </v-card-text>
         <v-spacer></v-spacer>
-        <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip >WhatsApp group(s)</v-chip></v-col>
-            <v-col cols="6"><v-card-text class="mt-n4">{{whatsApp()}}</v-card-text></v-col>
-        </v-row>
 
         <v-row no-gutters>
             <v-col cols="6"  class="text-right mt-n2"><v-chip class="mt-3">Telephone</v-chip></v-col>
@@ -89,11 +90,15 @@
         </v-row>
         <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Date Joined</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text> {{ member.joinedDate }}   </v-card-text></v-col>
+            <v-col cols="6" class="mt-n2"><v-card-text> {{ new Date(member.joinedDate).toDateString() }}   </v-card-text></v-col>
         </v-row>
         <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Committee post(s)</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text> {{ member.committee }}   </v-card-text></v-col>
+            <v-col cols="6" class="mt-n2"><v-card-text> {{ committeeList() }}   </v-card-text></v-col>
+        </v-row>
+        <v-row no-gutters>
+            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">WhatsApp group(s)</v-chip></v-col>
+            <v-col cols="6"  class="mt-n2"><v-card-text>{{whatsAppList()}}</v-card-text></v-col>
         </v-row>
         <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Subs</v-chip></v-col>

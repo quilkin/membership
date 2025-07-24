@@ -91,6 +91,7 @@ function cancel() {
       <v-card-title class="headline black" primary-title>
         TCC Membership account
       </v-card-title>
+      <v-card-text> Same username and password as used for RideHub</v-card-text>
       <v-card-text class="pa-1">
         <v-form @submit.prevent="submit" ref="accountForm">
           <v-row no-gutters>

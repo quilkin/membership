@@ -150,7 +150,7 @@ function dateColour(i: number) {
         <v-col cols="1"  title="Number"> &nbsp;{{ member.number }}   </v-col>
         <v-col cols="3"  title="First Name"> &nbsp;{{ member.fname }}   </v-col>
         <v-col cols="3"  title="Last Name"> &nbsp;{{ member.name }}   </v-col>
-        <v-col cols="2" >
+        <v-col cols="2" title = "Paid Date">
           <v-chip size="small" :color=dateColour(i) variant="outlined">{{  new Date(member.paidDate).toDateString() }}</v-chip> 
         </v-col>
 

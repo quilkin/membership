@@ -155,9 +155,9 @@ function setYear(year : number) {
 <template>
   <v-container  class="pa-0" >
       <v-row>
-        <v-col cols="12" class="mt-3">TCC Tourist Trophy (and Leader Trophy) covering the period...</v-col>
+        <v-col cols="12" class="mt-3">To do....</v-col>
       </v-row>
-      <v-row no-gutters>
+      <!-- <v-row no-gutters>
         <v-radio-group class="pa-1" inline v-model="choosePeriod">
           <v-radio :label=yearLabel(1)  value="last" @click="changePeriod('last')"
           >
@@ -177,7 +177,7 @@ function setYear(year : number) {
           <v-radio :label=yearLabel(2) value="y2d" @click="changePeriod('y2d')"></v-radio>
           <v-radio :label=yearLabel(3) value="3" @click="changePeriod('3')"></v-radio>
       </v-radio-group>
-  </v-row>
+  </v-row> -->
     
   </v-container>
 </template>

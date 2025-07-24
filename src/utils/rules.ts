@@ -12,6 +12,13 @@ export const nameRules =   [
                                 return 'name is min 2 characters.'
                                 },
                             ];
+export const addressRules =   [ 
+                            (value: string) => !!value || 'Required.', 
+                            (value: string) => {
+                                if (value.length >= 5) return true
+                                return 'address is min 5 characters.'
+                                },
+                            ];
 export const genderRules =   [ 
                             (value: string) => !!value || 'Required.', 
                             (value: string) => {

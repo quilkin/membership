@@ -5,7 +5,7 @@
  * Create a new ride or edit an existing one
  */
 import { ref, type Ref, onBeforeMount, onMounted, onBeforeUpdate} from 'vue'
-import { nameRules, genderRules, subsRules } from '../utils/rules'
+import { nameRules, genderRules, subsRules, emailRules,addressRules } from '../utils/rules'
 import { myFetch } from '@/utils/fetch'
 import { apiMethods } from '../../../membership-server/src/common/apimethods'
 import { Member } from '../../../membership-server/src/common/member'
@@ -17,8 +17,9 @@ import DateSelector  from './dateSelector.vue'
 const commArray= ref(['']);
 const fname = ref('');
 const name = ref('');
-const subs = ref(0);
+const subs = ref(20);
 const paidDate = ref(new Date());
+const dateChanged = ref(false);
 const gender = ref('');
 const address1 = ref ('');
 const address2 = ref ('');
@@ -60,6 +61,12 @@ update();
 onBeforeUpdate(async() => {
 
   update();
+  
+  if (props.member.number> 0) {
+    // editing existing ride
+
+    newMember = false;
+  }
 })
 
 /**
@@ -83,6 +90,7 @@ function update() {
     name.value = thisMember.name;
    gender.value = thisMember.gender;
     paidDate.value = thisMember.paidDate;
+    subs.value = thisMember.subs;
     telephone.value = thisMember.telephone;
     email.value = thisMember.email;
     waChat.value = thisMember.waChat>0;
@@ -135,24 +143,37 @@ async function submit() {
       thisMember.address2 = address2.value ;
       thisMember.address3 = address3.value  ;
       thisMember.postcode = postcode.value ;
-      thisMember.commArray = commArray.value ;
       thisMember.fname = fname.value ;
       thisMember.name = name.value ;
       thisMember.gender = gender.value  ;
-      thisMember.paidDate = paidDate.value ;
+      thisMember.paidDate = dateChanged.value? paidDate.value : new Date();
+      thisMember.subs = subs.value;
       thisMember.telephone = telephone.value ;
       thisMember.email = email.value ;
       thisMember.waChat = waChat.value ? 1:0;
       thisMember.waInfo = waInfo.value ? 1:0; 
       thisMember.waLeisure = waLeisure.value ? 1:0 ;
+      let commString = '';
+      if (commArray.value != undefined) {
+        // convert committeee array back to a string for database
+        if (commArray.value.length > 0) {
+            for (const p of commArray.value) {
+                commString += p;
+                commString += ' ';
+            }
+           thisMember.committee= commString;
+          }
+      }
+      
 
      if (newMember) {
+      thisMember.joinedDate = new Date();
       const res = await myFetch(apiMethods.saveMember,thisMember);
       if (res === null) 
         return;   // ??? is this correct ???
       const id = parseInt(res);
       if (Number.isInteger(id)) {
-        await Message('Member has been saved');
+        await Message('Member has been saved: new member number is ' + id);
       }
       else {
         await AlertError('Save Member Error',res);
@@ -178,7 +199,8 @@ async function submit() {
 }
 
 function newDate(newDate : Date) {
-  date.value = newDate;
+  paidDate.value = newDate;
+  dateChanged.value = true;
 }
 </script>
 
@@ -217,16 +239,16 @@ function newDate(newDate : Date) {
             <v-row >
               <v-col cols="5"  class="ml-3 mr-3" >
                 <v-row>
-                  <v-text-field density="compact"   variant="outlined" label="Address1"   v-model= "address1"/>
+                  <v-text-field density="compact"  :rules="addressRules" variant="outlined" label="Address1"   v-model= "address1"/>
                 </v-row>
                 <v-row>
-                  <v-text-field density="compact"   variant="outlined" label="Address2"   v-model= "address2"/>
+                  <v-text-field density="compact"  :rules="addressRules"  variant="outlined" label="Address2"   v-model= "address2"/>
                 </v-row>
                 <v-row>
                   <v-text-field density="compact"   variant="outlined" label="Address3"   v-model= "address3"/>
                 </v-row>
                 <v-row>
-                  <v-text-field density="compact"   variant="outlined" label="Postcode"   v-model= "postcode"/>
+                  <v-text-field density="compact"  :rules="addressRules"  variant="outlined" label="Postcode"   v-model= "postcode"/>
                 </v-row>
               </v-col>
               <v-col cols="5" class="ml-3 mr-3" >
@@ -234,32 +256,29 @@ function newDate(newDate : Date) {
                   <v-text-field density="compact"   variant="outlined" label="Telephone"   v-model= "telephone"/>
                 </v-row>
                 <v-row>
-                  <v-text-field density="compact"   variant="outlined" label="Email"   v-model= "email"/>
+                  <v-text-field density="compact"   :rules="emailRules"  variant="outlined" label="Email"   v-model= "email"/>
                 </v-row>
                 <v-row>                  Committee position(s):</v-row>
                 <v-row>
                   <v-col cols="6">
-                    <v-checkbox v-model="commArray" hide-details label="Secretary" value="secretary"></v-checkbox>
-                    <v-checkbox v-model="commArray" hide-details label="Chair" value="chair"></v-checkbox>
-                    <v-checkbox v-model="commArray" hide-details label="Membership" value="membership"></v-checkbox>
-                    <v-checkbox v-model="commArray" hide-details label="Social" value="social"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Secretary" value="secretary"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Chair" value="chair"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Membership" value="membership"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Social" value="social"></v-checkbox>
                   </v-col>
                   <v-col cols="6">
-                    <v-checkbox v-model="commArray" hide-details label="Racing" value="racing"></v-checkbox>
-                    <v-checkbox v-model="commArray" hide-details label="Kit" value="kit"></v-checkbox>
-                    <v-checkbox v-model="commArray" hide-details label="Marketing" value="marketing"></v-checkbox>
-                    <v-checkbox v-model="commArray" hide-details label="Non-Exec" value="nonexec"></v-checkbox>
-                </v-col>
-                  <!-- <v-text-field density="compact"   variant="outlined" label="Committee post" 
-                    hint="Leave blank if not on committee"
-                    v-model= "committee"/> -->
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Racing" value="racing"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Kit" value="kit"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Marketing" value="marketing"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Non-Exec" value="nonexec"></v-checkbox>
+                  </v-col>
                 </v-row>
               </v-col>
             </v-row>
 
           <v-row >
             <v-col cols="6">
-              WhatsApp groups (Committee group defined by committe position):
+              WhatsApp groups (Committee group defined by committee position):
             </v-col>
            
             <v-col>
@@ -276,7 +295,7 @@ function newDate(newDate : Date) {
 
           <v-row >
               <v-col cols="3"   >
-                  <v-text-field density="compact" variant="outlined" label="Subscription amount" 
+                  <v-text-field density="compact" variant="outlined" label="Subscription amount (£)" 
                     v-model="subs"
                     :rules="subsRules"
                     hint='Annual subs in £'/>
@@ -302,6 +321,9 @@ function newDate(newDate : Date) {
             </v-col>
             <v-col>
               <v-btn block color="green"  variant="outlined" @click="cancel()" >Cancel Edit</v-btn>
+            </v-col>
+            <v-col >
+              <v-btn block color="green" type="submit"  >Save Member</v-btn>
             </v-col>
 
           </v-row>

@@ -9,16 +9,17 @@ import accountActions from './components/accountActions.vue'
 import MemberEdit from './components/editMember.vue'
 import MemberList from './components/memberlist.vue'
 import Stats from './components/stats.vue'
+import { myFetch } from '@/utils/fetch'
+import { apiMethods } from '../../membership-server/src/common/apimethods'
 import { Member} from '../../membership-server/src/common/member'
 import { User, Roles} from '../../membership-server/src/common/user'
-import { Message } from './utils/alert'
+import { AlertError, Message } from './utils/alert'
 import { Tabs } from './utils/tabs'
 import { mdiAccountEdit ,mdiBike,mdiAccountPlus, mdiAccountMultiple, mdiFormatListNumberedRtl} from '@mdi/js'
 import { Localise } from '@/utils/localise';
 
 const currentTab = ref(Tabs.account);
 const currentUser = ref(new User('',''));
-const ridesDate = ref(new Date());
 const currentMember = ref(new Member());
 const editing = ref(false);
 const memberListChanged = ref(0);
@@ -26,12 +27,8 @@ const memberListChanged = ref(0);
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay();
 
-let rideDates : number[]  = [];
-
 function switchTab(tab: Tabs) {
   currentTab.value = tab;
-
-
 }
 function logIn()
 {
@@ -65,19 +62,27 @@ function checkLogIn()
  * After successful login, regsiter current user and go to calendar page (rides list)
  * @param user 
  */
-function doneLogin(user : User) {
+async function doneLogin(user : User) {
   if (user===null || user==undefined)
     return;
 
-  // if (user.role==0)
-  // {
-  //   console.log("guest user");
-  // }
-  // else {
-  //   console.log("login by " + user.name);
-  // }
-  currentUser.value = user;
-  switchTab(Tabs.members);
+  currentUser.value = user;   // Ridehub username
+
+  // find if user is on the committee
+  const res = await myFetch(apiMethods.findMember,user.email);
+  if (res.length > 1) {
+         AlertError("error"," there is more than one member with this email.");
+        return;
+      }
+  currentMember.value = res[0];
+  if (currentMember.value.committee.includes('membership') || currentMember.value.committee.includes('chair'))
+  // only these can see everything
+   switchTab(Tabs.members);
+  else // can just edit themselves 
+  {
+   editing.value = true;
+    switchTab(Tabs.newMember);
+  }
 
 }
 
@@ -103,26 +108,6 @@ function doneRideEdit() {
   switchTab(Tabs.members);
 }
 
-
-
-/**
- * Called from Ride List when all route data has been downloaded
- * @param routes routes for the rides
- * @param dates rides between these dates
- */
-function gotRides(dates : number[] ) {
-
-    rideDates = dates;
-}
-
-/**
- * Called when the user chooses a new start date for the rides list
- * @param date First date for the rides list
- */
-function newDate(date : Date) {
-  ridesDate.value = date;
-  ++memberListChanged.value;
-}
 
 function tabChanged() {
 

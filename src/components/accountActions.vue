@@ -25,7 +25,9 @@ enum Status {
         acccountPage
 }
 
-const status = ref(Status.loggingIn)
+const status = ref(Status.loggingIn);
+// used to transfer from RideHub
+const userEmail = ref('');
 let currentUser : User;
 
 let updated = false;
@@ -33,21 +35,29 @@ let updated = false;
 onMounted(async() => {
 
   currentUser = props.user;
-  // check for (and act on) any URL params for registration
-  // when app is accessed automatically from registration or 'forgot pw' emails
-  let urlParams = new URLSearchParams(window.location.search);
-  const username = urlParams.get('user');
-  const regcode = urlParams.get('regcode');
-  const userWhoForgotPW = urlParams.get('pwuser');
+  // check for (and act on) any URL params for being called from RideHub to edit personal details
+  
+   let urlParams = new URLSearchParams(window.location.search);
+   const email = urlParams.get('email');
+   if (email != null) {
+        userEmail.value = email;
+   }
 
-  if (username !== null && regcode !== null) {
-        await completeRegistration(username, regcode);
-  }
-  else if (userWhoForgotPW !== null && regcode !== null) {
-        await resetAccount(userWhoForgotPW);
-  }
-  else if (props.user != undefined)
-        status.value =  props.user.role>Roles.None ? Status.loggedIn : Status.loggingIn;
+  
+//   if (useremail !== null ) {
+//          // find the user 
+//         const res = await myFetch(apiMethods.findMember,useremail);
+//         if (res.length > 1) {
+//                 AlertError(useremail," there is more than one member with this email.");
+//         return;
+//         const thisMember = res[0];
+//         const 
+//       }
+
+//   }
+
+  //else if (props.user != undefined)
+  //      status.value =  props.user.role>Roles.None ? Status.loggedIn : Status.loggingIn;
 
   })
   onUpdated(() => {
@@ -125,6 +135,7 @@ function guest() {
 
 <template>
     <login  v-if="status===Status.loggingIn"
+        :useremail="userEmail"
             @logged-in="loggedIn"
             @sign-up="status=Status.signingUp"
             @forgot-pass="status=Status.reqPassword"

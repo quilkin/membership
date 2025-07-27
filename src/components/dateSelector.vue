@@ -44,7 +44,6 @@ import '@vuepic/vue-datepicker/dist/main.css';
            no-minutes-overlay
            :clearable="false"
            @update:modelValue="newDate" 
-           :min-date="new Date()"
            :six-weeks="true"   />
   </div>
 </template>

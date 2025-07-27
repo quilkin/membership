@@ -9,7 +9,7 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
 import { Member } from '../../../membership-server/src/common/member'
 import { User, Roles } from '../../../membership-server/src/common/user'
 import MemberDetails from './memberDetails.vue'
-import { AlertError, Message } from '../utils/alert'
+import { AlertError, Message, YesNo } from '../utils/alert'
 import '@vuepic/vue-datepicker/dist/main.css';
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay();
@@ -124,6 +124,24 @@ function dateColour(i: number) {
   return 'black';
 
 }
+async function payment(i: number) {
+    await YesNo('Update payment, Payment made today?', async ()=> {
+     const now = new Date();
+     const m: Member = members.value[i];
+     m.paidDate = now;
+     const res = await myFetch(apiMethods.payment,m);
+      if (res === null) 
+        return;
+      if (res=="OK") {
+        await Message("payment updated");
+      }
+      else {
+        await AlertError('payment not updated',res);
+        return;
+      }
+
+  })
+}
 
 
 
@@ -132,7 +150,7 @@ function dateColour(i: number) {
 <template>
 
   <v-container >
-  <v-list   density="compact" class="pa-0">
+  <v-list   density="compact" class="pa-0" border="sm">
     <!-- <v-list-item >
       <v-row  no-gutters>
         <v-col cols="1" > num </v-col>
@@ -150,8 +168,13 @@ function dateColour(i: number) {
         <v-col cols="1"  title="Number"> &nbsp;{{ member.number }}   </v-col>
         <v-col cols="3"  title="First Name"> &nbsp;{{ member.fname }}   </v-col>
         <v-col cols="3"  title="Last Name"> &nbsp;{{ member.name }}   </v-col>
-        <v-col cols="2" title = "Paid Date">
-          <v-chip size="small" :color=dateColour(i) variant="outlined">{{  new Date(member.paidDate).toDateString() }}</v-chip> 
+        <v-col cols="2" title = "Update Payment Date">
+          <v-chip
+           size="small"
+           :color=dateColour(i)
+           variant="outlined"
+           @click = payment(i)>
+           {{  new Date(member.paidDate).toDateString() }}</v-chip> 
         </v-col>
 
         <v-col  cols="3" sm="2">

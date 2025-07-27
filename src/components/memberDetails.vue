@@ -5,6 +5,7 @@
   //import { User } from '../utils/user'
   import { Message } from '../utils/alert'
   import { mdiAccount } from '@mdi/js'
+  import detailsLine from './detailsLine.vue'
 
   const props = defineProps<{ 
     member : Member ,
@@ -80,34 +81,45 @@
         <v-card-text  class="mt-3">    {{ member.address1 }} {{ member.address2 }} {{ member.address3}} {{ member.postcode }}   </v-card-text>
         <v-spacer></v-spacer>
 
-        <v-row no-gutters>
-            <v-col cols="6"  class="text-right mt-n2"><v-chip class="mt-3">Telephone</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text> {{ member.telephone }}   </v-card-text></v-col>
-        </v-row>
-        <v-row no-gutters>
+        <detailsLine title = 'Telephone'          :info= "member.phone"  /> 
+        <detailsLine title = 'Email'              :info= "member.email" @clicked="sendEmail()"  /> 
+        <detailsLine title = 'Date Joined<'       :info= "new Date(member.joinedDate).toDateString()"  /> 
+        <detailsLine title = 'Committee post(s)'  :info= "committeeList()"  /> 
+        <detailsLine title = 'WhatsApp group(s)'  :info= "whatsAppList()"  /> 
+        <detailsLine title = 'Subs'               :info= "'£' + member.subs.toString()"  />
+        <detailsLine title = 'Date Last Paid'     :info= "new Date(member.paidDate).toDateString()"  />
+        <detailsLine title = 'Next of Kin'        :info= "member.nextOfKin"  />
+        <detailsLine title = 'N-o-kin phone'      :info= "member.nokPhone"  />
+
+
+        <!-- <v-row no-gutters>
+            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Telephone</v-chip></v-col>
+            <v-col cols="6" class="mt-n4"><v-card-text> {{ member.phone }}   </v-card-text></v-col>
+        </v-row> -->
+        <!-- <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Email</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text @click=sendEmail()> {{ member.email }}   </v-card-text></v-col>
-        </v-row>
-        <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Date Joined</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text> {{ new Date(member.joinedDate).toDateString() }}   </v-card-text></v-col>
+            <v-col cols="6" class="mt-n4"><v-card-text @click=sendEmail()> {{ member.email }}   </v-card-text></v-col>
+        </v-row> -->
+        <!-- <v-row no-gutters>
+            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">/v-chip></v-col>
+            <v-col cols="6" class="mt-n4"><v-card-text> {{ new Date(member.joinedDate).toDateString() }}   </v-card-text></v-col>
         </v-row>
         <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Committee post(s)</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text> {{ committeeList() }}   </v-card-text></v-col>
+            <v-col cols="6" class="mt-n4"><v-card-text> {{ committeeList() }}   </v-card-text></v-col>
         </v-row>
         <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">WhatsApp group(s)</v-chip></v-col>
-            <v-col cols="6"  class="mt-n2"><v-card-text>{{whatsAppList()}}</v-card-text></v-col>
+            <v-col cols="6"  class="mt-n4"><v-card-text>{{whatsAppList()}}</v-card-text></v-col>
         </v-row>
         <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Subs</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text> £{{ member.subs}}   </v-card-text></v-col>
+            <v-col cols="6" class="mt-n4"><v-card-text> £{{ member.subs}}   </v-card-text></v-col>
         </v-row>
         <v-row no-gutters>
             <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Date Last Paid</v-chip></v-col>
-            <v-col cols="6" class="mt-n2"><v-card-text> {{ member.paidDate }}   </v-card-text></v-col>
-        </v-row>
+            <v-col cols="6" class="mt-n4"><v-card-text> {{ new Date(member.paidDate).toDateString() }}   </v-card-text></v-col>
+        </v-row> -->
 
         <v-card-actions>
             <v-btn 

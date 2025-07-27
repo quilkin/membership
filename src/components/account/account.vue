@@ -89,7 +89,7 @@ function cancel() {
   <div class="d-flex align-center flex-column">
    <v-card >
       <v-card-title class="headline black" primary-title>
-        TCC Membership account
+        TCC Membership / RideHub account
       </v-card-title>
       <v-card-text> Same username and password as used for RideHub</v-card-text>
       <v-card-text class="pa-1">

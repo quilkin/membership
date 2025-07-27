@@ -20,7 +20,10 @@ const password = ref('');
 const showPass = ref(false);
 const remember = ref(false);
 
-const emit = defineEmits(['loggedIn','signUp','forgotPass','guestVisit'])
+const emit = defineEmits(['loggedIn','forgotPass']);
+const props = defineProps<{
+  useremail : String
+}>()
 
 onBeforeMount( () => {
    if (window.localStorage.username !== undefined && window.localStorage.password !== undefined) {

@@ -3,20 +3,19 @@
 /**
  * Controlling the four sub-views under ./account
  */
-import { ref, onMounted, onUpdated } from 'vue'
+import { ref, onMounted, onUpdated,  onBeforeMount } from 'vue'
 import login from './account/login.vue'
 import account from './account/account.vue'
-import reqpass from './account/reqpassword.vue'
 import { myFetch } from '../utils/fetch'
 import { apiMethods} from '../../../membership-server/src/common/apimethods'
 import { User, Roles} from '../../../membership-server/src/common/user'
 import { Message, AlertError } from '../utils/alert'
-//import { Events } from '../utils/events'
 
 const props = defineProps<{
   user : User
 }>()
 
+// todo: i don't think we need this
 enum Status {
         loggingIn,
         loggedIn,
@@ -32,32 +31,20 @@ let currentUser : User;
 
 let updated = false;
 
-onMounted(async() => {
-
-  currentUser = props.user;
-  // check for (and act on) any URL params for being called from RideHub to edit personal details
+onBeforeMount( () => {
+          // check for (and act on) any URL params for being called from RideHub to edit personal details
   
    let urlParams = new URLSearchParams(window.location.search);
    const email = urlParams.get('email');
    if (email != null) {
         userEmail.value = email;
    }
+})
 
-  
-//   if (useremail !== null ) {
-//          // find the user 
-//         const res = await myFetch(apiMethods.findMember,useremail);
-//         if (res.length > 1) {
-//                 AlertError(useremail," there is more than one member with this email.");
-//         return;
-//         const thisMember = res[0];
-//         const 
-//       }
+onMounted(async() => {
 
-//   }
+  currentUser = props.user;
 
-  //else if (props.user != undefined)
-  //      status.value =  props.user.role>Roles.None ? Status.loggedIn : Status.loggingIn;
 
   })
   onUpdated(() => {
@@ -81,69 +68,14 @@ function doneAccount() {
         emit('doneAccount',props.user);
 }
 
-/**
- * will be called automaticfally when user clciks link in registration email
- * @param user the rider's username
- * @param regcode the unique code sent in the email
- */
-async function completeRegistration(user: string,regcode: string) {
-        var creds = { name: user, code: regcode };
-        const res = await myFetch(apiMethods.register, creds);
-        if (res===null)
-                await AlertError("Credentials","Invalid username , code or email");
-        else if (res.substring(0, 9) === "Thank you")           //"Thank you, you have now registered" sent from server
-        {
-                await Message("Thank you, you can now log in");
-                
-        // close current page and re-open, in normal fashion (i.e.no URL parameters)
-                let thisWindow = window.location.href;
-                let qmark = thisWindow.indexOf('?');
-                thisWindow = thisWindow.substring(0,qmark-1);
-                window.open(thisWindow,"_self")
-        } else {
-                await AlertError("Credentials",res);
-        }
 
-}
-
-/**
- * will be called automaticfally when user clciks link in 'lost password' email
- * @param lostPWuser 
- */
-async function resetAccount(lostPWuser : string) {
-        // get user's details
-        // server will check that timeout hasn't expired
-        var success = false;
-        const user : User = await myFetch(apiMethods.findUser,  lostPWuser);
-        if (user != null) {
-
-                success = true;
-                await Message(`OK ${user.name}, now please set new password`);
-                currentUser = user;
-                status.value = Status.acccountPage;
-        }
-
-        else {
-                await AlertError("Credentials",'email or username problem');
-        }
-}
-function guest() {
-        console.log('guest visit emit donelogin')
-        emit('doneLogin',new User('',''));
-}
 </script>
 
 <template>
     <login  v-if="status===Status.loggingIn"
         :useremail="userEmail"
             @logged-in="loggedIn"
-            @sign-up="status=Status.signingUp"
-            @forgot-pass="status=Status.reqPassword"
-            @guest-visit="guest"
             ></login>
-    <reqpass v-else-if="status===Status.reqPassword"
-            @done-pass="status=Status.loggingIn"
-    ></reqpass>
 
     <account v-else
             :user="currentUser"

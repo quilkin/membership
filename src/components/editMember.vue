@@ -98,7 +98,7 @@ function update() {
    postcode.value = thisMember.postcode;
    commArray.value = thisMember.commArray;
     fname.value = thisMember.fname;
-    name.value = thisMember.name;
+    name.value = thisMember.surname;
    gender.value = thisMember.gender;
     paidDate.value = thisMember.paidDate;
     subs.value = thisMember.subs;
@@ -159,7 +159,7 @@ async function submit() {
       thisMember.address3 = address3.value  ;
       thisMember.postcode = postcode.value ;
       thisMember.fname = fname.value ;
-      thisMember.name = name.value ;
+      thisMember.surname = name.value ;
       thisMember.gender = gender.value  ;
       if (dateChanged.value)
         thisMember.paidDate = paidDate.value;
@@ -233,9 +233,7 @@ function newDate(newDate : Date) {
       <v-card-subtitle>
         These details can only be seen by you and the club membership secretary.
       </v-card-subtitle>
-      <v-card-subtitle>
-         Next-of-kin details can also be seen by other members that are on a ride that you are on, in case of an accident - but only on the day of that ride.
-      </v-card-subtitle>
+
       <v-card-text class="pa-3">
         <v-form @submit.prevent="submit"  ref="memberForm">
       
@@ -299,10 +297,19 @@ function newDate(newDate : Date) {
                   </v-col>
                 </v-row>
                 <v-row>
-                  <v-text-field density="compact"   variant="outlined" label="Next of kin"  v-model= "nextOfKin"/>
+                  <v-card-subtitle>
+                     Emergency contact details can also be seen by other members that are on a ride that you are on, 
+                  </v-card-subtitle>
+                  <v-card-subtitle>
+                     in case of an accident - but only on the day of that ride.
+                  </v-card-subtitle>
+
                 </v-row>
                 <v-row>
-                  <v-text-field density="compact"   variant="outlined" label="next-of-kin Phone" v-model= "nokPhone"/>
+                  <v-text-field class="mt-6" density="compact"   variant="outlined" label="Emergency contact"  v-model= "nextOfKin"/>
+                </v-row>
+                <v-row>
+                  <v-text-field density="compact"   variant="outlined" label="Contact's phone" v-model= "nokPhone"/>
                 </v-row>
               </v-col>
             </v-row>

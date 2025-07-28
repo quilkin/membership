@@ -3,37 +3,41 @@
   import { Member } from '../../../membership-server/src/common/member'
    import { User, Roles } from '../../../membership-server/src/common/user'
   //import { User } from '../utils/user'
-  import { Message } from '../utils/alert'
+  import { AlertError, Message } from '../utils/alert'
   import { mdiAccount } from '@mdi/js'
+  import { myFetch } from '@/utils/fetch'
   import detailsLine from './detailsLine.vue'
+import { apiMethods } from '../../../membership-server/src/common/apimethods'
 
   const props = defineProps<{ 
     member : Member ,
-    user: User
-
-    }>();
+     }>();
 
   const emit = defineEmits(['logIn','detailsDone','editMember']);
   const detailsActive = ref(false);
   const member = props.member;
-  
+  const rideHubLogin = ref('');
+ 
 
-  // possible texts for the 'join' button
-  const joinText = 'Join';
-  let buttonText = joinText;
+  // // possible texts for the 'join' button
+  // const joinText = 'Join';
+  // let buttonText = joinText;
 
-  onMounted(() => {
-
-  });
-
-  async function checkLogin() {
-    if (props.user.role === Roles.None)
-    {
-        // not logged in, not allowed to see details or join a ride
-        await Message('You need to sign in to continue');
-        emit('logIn');
-    }
+/**
+ *  find the ridehub login name here
+ */
+  async function getLogIn() {
     detailsActive.value = true;
+    const logins: User[]   = await myFetch(apiMethods.findLoginName,member.email);
+    let login0: User= logins[0];
+    if (login0 == undefined) {
+       rideHubLogin.value = 'not found';
+      AlertError('Email mismatch?',`Member's email (${member.email}) not found in RideHub database`);
+      detailsActive.value = true;
+    }
+    else
+      rideHubLogin.value = login0.name;
+
 
   }
 
@@ -41,8 +45,9 @@
         emit('editMember',member);
         detailsActive.value = false;
   }
-  function fullName(m : Member) : string {
-    return member.fname + ' ' + member.name;
+  function fullName() : string {
+
+    return member.fname + ' ' + member.surname;
   }
  function sendEmail() {
   window.open('mailto:' + member.email)
@@ -57,16 +62,20 @@
   return waString;
  }
 
- function committeeList() {
+ function committeeList() : string {
+
+
   if (member.commArray != undefined)
     return member.committee;
   return 'no';
  }
+
+
 </script>
 
 <template>
   <div class="text-center">
-    <v-btn size="small"  variant='outlined'  color="green" :prepend-icon="mdiAccount" width="110" @click="checkLogin()">
+    <v-btn size="small"  variant='outlined'  color="green" :prepend-icon="mdiAccount" width="110" @click="getLogIn()">
         Details
     </v-btn>
     
@@ -77,10 +86,11 @@
         
         content-class="details-dialog"
       >
-      <v-card :title="fullName(member)" max-width="550">
+      <v-card :title="fullName()" max-width="550">
         <v-card-text  class="mt-3">    {{ member.address1 }} {{ member.address2 }} {{ member.address3}} {{ member.postcode }}   </v-card-text>
         <v-spacer></v-spacer>
 
+        <detailsLine title = 'RideHub login'      :info= "rideHubLogin"  /> 
         <detailsLine title = 'Telephone'          :info= "member.phone"  /> 
         <detailsLine title = 'Email'              :info= "member.email" @clicked="sendEmail()"  /> 
         <detailsLine title = 'Date Joined<'       :info= "new Date(member.joinedDate).toDateString()"  /> 
@@ -88,40 +98,11 @@
         <detailsLine title = 'WhatsApp group(s)'  :info= "whatsAppList()"  /> 
         <detailsLine title = 'Subs'               :info= "'£' + member.subs.toString()"  />
         <detailsLine title = 'Date Last Paid'     :info= "new Date(member.paidDate).toDateString()"  />
-        <detailsLine title = 'Next of Kin'        :info= "member.nextOfKin"  />
-        <detailsLine title = 'N-o-kin phone'      :info= "member.nokPhone"  />
+        <detailsLine title = 'Emergency contact'        :info= "member.nextOfKin"  />
+        <detailsLine title = 'Contact phone'      :info= "member.nokPhone"  />
 
 
-        <!-- <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Telephone</v-chip></v-col>
-            <v-col cols="6" class="mt-n4"><v-card-text> {{ member.phone }}   </v-card-text></v-col>
-        </v-row> -->
-        <!-- <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Email</v-chip></v-col>
-            <v-col cols="6" class="mt-n4"><v-card-text @click=sendEmail()> {{ member.email }}   </v-card-text></v-col>
-        </v-row> -->
-        <!-- <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">/v-chip></v-col>
-            <v-col cols="6" class="mt-n4"><v-card-text> {{ new Date(member.joinedDate).toDateString() }}   </v-card-text></v-col>
-        </v-row>
-        <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Committee post(s)</v-chip></v-col>
-            <v-col cols="6" class="mt-n4"><v-card-text> {{ committeeList() }}   </v-card-text></v-col>
-        </v-row>
-        <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">WhatsApp group(s)</v-chip></v-col>
-            <v-col cols="6"  class="mt-n4"><v-card-text>{{whatsAppList()}}</v-card-text></v-col>
-        </v-row>
-        <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Subs</v-chip></v-col>
-            <v-col cols="6" class="mt-n4"><v-card-text> £{{ member.subs}}   </v-card-text></v-col>
-        </v-row>
-        <v-row no-gutters>
-            <v-col cols="6" class="text-right mt-n2"><v-chip class="mt-3">Date Last Paid</v-chip></v-col>
-            <v-col cols="6" class="mt-n4"><v-card-text> {{ new Date(member.paidDate).toDateString() }}   </v-card-text></v-col>
-        </v-row> -->
-
-        <v-card-actions>
+         <v-card-actions>
             <v-btn 
                 variant="elevated" color="green" id="edit" @click="editMember()"
                 > Edit</v-btn>

@@ -22,7 +22,7 @@ const remember = ref(false);
 
 const emit = defineEmits(['loggedIn','forgotPass']);
 const props = defineProps<{
-  useremail : String
+  useremail : string
 }>()
 
 onBeforeMount( () => {
@@ -33,6 +33,9 @@ onBeforeMount( () => {
             remember.value = true;
         }
       }
+      if (props.useremail.length > 0)
+        userOrEmail.value = props.useremail;
+
   })
 
 async function submit() {
@@ -74,14 +77,7 @@ async function submit() {
 }
 
 
-function forgot() {
-  emit("forgotPass");
 
-}
-// function crash() {
-//   myFetch('crashtest1',null);
-//   setTimeout(function() { myFetch('test',null); }, 5000);
-// }
 </script>
 
 <template>
@@ -91,10 +87,11 @@ function forgot() {
       Sign in to TCC membership database
     </v-card-title>
     <v-card-text> Same username and password as used for RideHub</v-card-text>
+    <v-card-text> If you have forgotten your password, please use RideHub method to retrieve it</v-card-text>
     <v-card-text class="pa-2">
       <v-form @submit.prevent="submit" ref="loginForm">
         <v-text-field v-model="userOrEmail"  :rules="nameRules" autocapitalize="off"
-         label="Email" hint="Same email as your TCC email address">
+         label="Email or username" hint="Same email as your TCC email address">
         </v-text-field>
         <v-text-field v-model="password" :append-inner-icon="showPass ? mdiEye : mdiEyeOff"
           @click:append-inner="showPass = !showPass"   :type="showPass ? 'text' : 'password'" 
@@ -108,7 +105,6 @@ function forgot() {
           value="false"
         ></v-checkbox>
         <v-btn color="green" type="submit" block class="mt-2">    Sign in     </v-btn>
-        <v-btn color="green" variant="outlined" @click="forgot()" block class="mt-2">      Forgot password?   </v-btn>
      
       </v-form>
     </v-card-text>

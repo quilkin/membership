@@ -15,7 +15,7 @@ import { Member} from '../../membership-server/src/common/member'
 import { User, Roles} from '../../membership-server/src/common/user'
 import { AlertError, Message } from './utils/alert'
 import { Tabs } from './utils/tabs'
-import { mdiAccountEdit ,mdiBike,mdiAccountPlus, mdiAccountMultiple, mdiFormatListNumberedRtl} from '@mdi/js'
+import { mdiAccountEdit ,mdiAccountPlus, mdiAccountMultiple, mdiFormatListNumberedRtl} from '@mdi/js'
 import { Localise } from '@/utils/localise';
 
 const currentTab = ref(Tabs.account);
@@ -23,6 +23,7 @@ const currentUser = ref(new User('',''));
 const currentMember = ref(new Member());
 const editing = ref(false);
 const memberListChanged = ref(0);
+const onCommittee = ref(true);
 
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay();
@@ -80,7 +81,8 @@ async function doneLogin(user : User) {
    switchTab(Tabs.members);
   else // can just edit themselves 
   {
-   editing.value = true;
+    onCommittee.value = false;
+    editing.value = true;
     switchTab(Tabs.newMember);
   }
 
@@ -160,15 +162,15 @@ const tabWidth= computed(() => {
       :grow="mobile===false"
       @update:model-value="tabChanged"
       >
-      <v-tab :value=Tabs.members :style="{...tabWidth}" @click="calendarClicked">  <v-icon :icon="mdiAccountMultiple"/> Members</v-tab>
-      <v-tab :value=Tabs.newMember :style="{...tabWidth}">   <v-icon :icon="mdiAccountPlus"/>        New member</v-tab>
-      <v-tab :value=Tabs.account :style="{...tabWidth}">    <v-icon :icon="mdiAccountEdit"/>  Account</v-tab>
-      <v-tab :value=Tabs.stats :style="{...tabWidth}">    <v-icon :icon="mdiFormatListNumberedRtl"/>        Stats</v-tab>
+      <v-tab v-if="onCommittee" :value=Tabs.members :style="{...tabWidth}" @click="calendarClicked">  <v-icon :icon="mdiAccountMultiple"/> Members</v-tab>
+      <v-tab :value=Tabs.newMember :style="{...tabWidth}">   <v-icon :icon="mdiAccountPlus"/> Edit/New member</v-tab>
+      <v-tab v-if="onCommittee" :value=Tabs.account :style="{...tabWidth}">    <v-icon :icon="mdiAccountEdit"/>  Account</v-tab>
+      <v-tab v-if="onCommittee" :value=Tabs.stats :style="{...tabWidth}">    <v-icon :icon="mdiFormatListNumberedRtl"/>        Stats</v-tab>
 
     </v-tabs>
 
       <v-window v-model="currentTab">
-        <v-window-item :value=Tabs.members>
+        <v-window-item  v-if="onCommittee" :value=Tabs.members>
           <v-container >
                 <MemberList
                  :key = "memberListChanged"
@@ -196,7 +198,7 @@ const tabWidth= computed(() => {
         </v-window-item>
         
 
-        <v-window-item :value=Tabs.account>
+        <v-window-item  v-if="onCommittee" :value=Tabs.account>
           <v-container  class=" scrollable">
             <account-actions 
               :user="currentUser"
@@ -207,7 +209,7 @@ const tabWidth= computed(() => {
         </v-container>
         </v-window-item>
 
-        <v-window-item :value=Tabs.stats>
+        <v-window-item  v-if="onCommittee":value=Tabs.stats>
           <v-container  class="">
             <Stats
             :user="currentUser"

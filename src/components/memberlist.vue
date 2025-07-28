@@ -30,6 +30,7 @@ const id = ref() as Ref<number[]>;
 const fname = ref() as Ref<string[]>;
 const name = ref() as Ref<string[]>;
 const paidDate = ref() as Ref<string[]>;
+const orderBy = ref('number');
 
 let currentRideIndex = 0;
 
@@ -62,7 +63,7 @@ async function getData() {
   const memberIDs: number[] = [];
  
   try {
-     members.value   = await myFetch(apiMethods.getMembers,0);
+     members.value   = await myFetch(apiMethods.getMembers,orderBy.value);
     if (!members.value  )  throw new Error(`Cannot get member list`);
 
     if (members.value.length == 0)
@@ -119,7 +120,10 @@ function dateColour(i: number) {
   const m: Member = members.value[i];
   const then = new Date(m.paidDate);
   const diff = now.valueOf() - then.valueOf();
-  if (diff > 1000 * 60 *60 * 24 * 365)
+
+  if (diff > 1000 * 60 *60 * 24 * 365)  //more than a year
+    return 'orange';
+  if (diff > 1000 * 60 *60 * 24 * 455)  //more than a year and 3 months
     return 'red';
   return 'black';
 
@@ -142,32 +146,38 @@ async function payment(i: number) {
 
   })
 }
-
+async function changeOrder(order: string) {
+  orderBy.value = order;
+  await getData();
+}
 
 
 </script>
 
 <template>
-
+      <v-row no-gutters>
+        <v-col cols="2">
+          <v-card-text>Order member list by: </v-card-text>
+        </v-col>
+        <v-col cols="10">
+          <v-radio-group class="pa-1" inline v-model="orderBy">
+            <v-radio label='Number' value="number" @click="changeOrder('number')" />
+            <v-radio label='First Name' value="fname" @click="changeOrder('fname')"  />
+            <v-radio label='Surname' value="name" @click="changeOrder('name')"  />
+            <v-radio label='Paid date' value="paidDate" @click="changeOrder('paidDate')"  />
+          </v-radio-group>
+        </v-col>
+    </v-row>
   <v-container >
   <v-list   density="compact" class="pa-0" border="sm">
-    <!-- <v-list-item >
-      <v-row  no-gutters>
-        <v-col cols="1" > num </v-col>
-        <v-col cols="3" >first name</v-col>
-        <v-col cols="3" >surname</v-col>
-        <v-col cols="2" >last paid</v-col>
-   
-      </v-row>
-      
-    </v-list-item> -->
+
     <v-list-item class="pl-0 pr-0 mt-n1 mb-n3" v-for="(member, i) in members" :key="i"  >
 
       <v-row  no-gutters class="ma1">
 
         <v-col cols="1"  title="Number"> &nbsp;{{ member.number }}   </v-col>
         <v-col cols="3"  title="First Name"> &nbsp;{{ member.fname }}   </v-col>
-        <v-col cols="3"  title="Last Name"> &nbsp;{{ member.name }}   </v-col>
+        <v-col cols="3"  title="Last Name"> &nbsp;{{ member.surname }}   </v-col>
         <v-col cols="2" title = "Update Payment Date">
           <v-chip
            size="small"

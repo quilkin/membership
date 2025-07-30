@@ -24,6 +24,7 @@ const currentMember = ref(new Member());
 const editing = ref(false);
 const memberListChanged = ref(0);
 const onCommittee = ref(true);
+const editKey = ref(0);
 
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay();
@@ -68,20 +69,31 @@ async function doneLogin(user : User) {
     return;
 
   currentUser.value = user;   // Ridehub username
-
+  onCommittee.value = false;
   // find if user is on the committee
   const res = await myFetch(apiMethods.findMember,user.email);
   if (res.length > 1) {
          AlertError("error"," there is more than one member with this email.");
         return;
       }
-  currentMember.value = res[0];
-  if (currentMember.value.committee.includes('membership') || currentMember.value.committee.includes('chair'))
-  // only these can see everything
-   switchTab(Tabs.members);
+  if (res.length == 1) {
+    currentMember.value = res[0];
+    const commttee = currentMember.value.committee.toLowerCase();
+    if (commttee.includes('membership') || commttee.includes('chair'))
+      onCommittee.value = true;
+  }
+  if (currentMember.value.number == 0) {
+    AlertError("Member not found in database","Either you're not a paid-up TCC member, or the enmail used for RideHub is not the same as the one in the membership list. Please contact the membership secretary")
+    return;
+  }
+  // now we definately know the member, force update of edit page 
+  editKey.value += 1;
+
+  if (onCommittee.value)
+    // only these can see everything
+    switchTab(Tabs.members);
   else // can just edit themselves 
   {
-    onCommittee.value = false;
     editing.value = true;
     switchTab(Tabs.newMember);
   }
@@ -104,7 +116,7 @@ function logout()
   currentUser.value = new User('','');
   switchTab(Tabs.members);
 }
-function doneRideEdit() {
+function doneMemberEdit() {
   editing.value = false;
   ++memberListChanged.value;
   switchTab(Tabs.members);
@@ -187,10 +199,11 @@ const tabWidth= computed(() => {
         <v-window-item :value=Tabs.newMember>
           <v-container  class=" scrollable">
                 <MemberEdit v-if="checkLogIn() && editing"
+                :key = "editKey"
                 :member="currentMember"
-                :user="currentUser"
+                :onCommittee="onCommittee"
                 @log-in="logIn"
-                @done-ride-edit="doneRideEdit"
+                @done-member-edit="doneMemberEdit"
 
                 >
               </MemberEdit>

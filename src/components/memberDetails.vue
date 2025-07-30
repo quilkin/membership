@@ -98,13 +98,13 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
         <detailsLine title = 'WhatsApp group(s)'  :info= "whatsAppList()"  /> 
         <detailsLine title = 'Subs'               :info= "'£' + member.subs.toString()"  />
         <detailsLine title = 'Date Last Paid'     :info= "new Date(member.paidDate).toDateString()"  />
-        <detailsLine title = 'Emergency contact'        :info= "member.nextOfKin"  />
+        <detailsLine title = 'Emergency contact'  :info= "member.nextOfKin"  />
         <detailsLine title = 'Contact phone'      :info= "member.nokPhone"  />
 
 
          <v-card-actions>
             <v-btn 
-                variant="elevated" color="green" id="edit" @click="editMember()"
+                variant="elevated" color="green" id="edit" @click="editMember()" @done-member-edit = "detailsActive = false"
                 > Edit</v-btn>
 
             <v-col class="text-right">

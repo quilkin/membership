@@ -2,7 +2,7 @@
 <script setup lang="ts">
 
 /**
- * Create a new ride or edit an existing one
+ * Create a new member or edit an existing one
  */
 import { ref, type Ref, onBeforeMount, onMounted, onBeforeUpdate} from 'vue'
 import { nameRules, genderRules, subsRules, emailRules,addressRules } from '../utils/rules'
@@ -12,12 +12,11 @@ import { Member } from '../../../membership-server/src/common/member'
 import { User, Roles  } from '../../../membership-server/src/common/user'
 import { Alert, Message, YesNo, AlertError } from '../utils/alert'
 import DateSelector  from './dateSelector.vue'
-import { ca } from 'vuetify/locale'
 
 // values that can be edited
 const commArray= ref(['']);
 const fname = ref('');
-const name = ref('');
+const surname = ref('');
 const subs = ref(20);
 const paidDate = ref(new Date());
 const dateChanged = ref(false);
@@ -44,7 +43,7 @@ let newMember = true;     // false for editing an existing one
 let thisMember : Member;
 
 const memberDialog = ref(false);
-/* possible outcomes of this edit */
+
 const emit = defineEmits(['doneMemberEdit','logIn']);
 const memberForm = ref();
 const date = ref(new Date());
@@ -52,27 +51,33 @@ const fullEdit = ref(false);
 
 const props = defineProps<{
   member : Member
-  user : User
+  onCommittee : boolean
 }>()
 
 onBeforeMount(async() => {
 
   if (props.member.number> 0) {
     // editing existing member
-
     newMember = false;
-
   }
-  if (props.member.committee.length > 0)
+  if (props.onCommittee == false) {
+        // editing user's own profile
+    newMember = false;
+  }
+  if (props.onCommittee)
     fullEdit.value = true;
+  console.log('OnBeforeMount: '+props.member.email);
   update();
   thisMember = props.member;
 })
 
 onBeforeUpdate(async() => {
 
+  if (props.onCommittee)
+    fullEdit.value = true;
+   console.log('OnBeforeUpdate: '+props.member.committee);
   update();
-  
+    thisMember = props.member;
   if (props.member.number> 0) {
     // editing existing ride
 
@@ -84,7 +89,7 @@ onBeforeUpdate(async() => {
  * update the page with new values
  */
 function update() {
-    if (props.user === undefined || props.member === undefined)
+    if (props.member === undefined)
     {
         AlertError('Internal error','invalid user or ride data');
         return;
@@ -98,7 +103,7 @@ function update() {
    postcode.value = thisMember.postcode;
    commArray.value = thisMember.commArray;
     fname.value = thisMember.fname;
-    name.value = thisMember.surname;
+    surname.value = thisMember.surname;
    gender.value = thisMember.gender;
     paidDate.value = thisMember.paidDate;
     subs.value = thisMember.subs;
@@ -159,7 +164,7 @@ async function submit() {
       thisMember.address3 = address3.value  ;
       thisMember.postcode = postcode.value ;
       thisMember.fname = fname.value ;
-      thisMember.surname = name.value ;
+      thisMember.surname = surname.value ;
       thisMember.gender = gender.value  ;
       if (dateChanged.value)
         thisMember.paidDate = paidDate.value;
@@ -247,7 +252,7 @@ function newDate(newDate : Date) {
               </v-col>
               <v-col cols="5"  >
                   <v-text-field density="compact"   variant="outlined" label="Surname" 
-                   v-model="name"
+                   v-model="surname"
                    :rules="nameRules"
                    hint=""/>
               </v-col>
@@ -264,7 +269,7 @@ function newDate(newDate : Date) {
                   <v-text-field density="compact"  :rules="addressRules" variant="outlined" label="Address1"   v-model= "address1"/>
                 </v-row>
                 <v-row>
-                  <v-text-field density="compact"  :rules="addressRules"  variant="outlined" label="Address2"   v-model= "address2"/>
+                  <v-text-field density="compact"    variant="outlined" label="Address2"   v-model= "address2"/>
                 </v-row>
                 <v-row>
                   <v-text-field density="compact"   variant="outlined" label="Address3"   v-model= "address3"/>
@@ -365,7 +370,7 @@ function newDate(newDate : Date) {
               <v-btn block color="green"  variant="outlined" @click="cancel()" >Cancel Edit</v-btn>
             </v-col>
             <v-col >
-              <v-btn block color="green" type="submit"  >Save Member</v-btn>
+              <v-btn v-if="thisMember.email.length > 0" block color="green" type="submit"  >Save Member</v-btn>
             </v-col>
 
           </v-row>

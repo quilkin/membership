@@ -1,9 +1,4 @@
-check route name hasn't been used already?
-add comments for anything non-obvious
-tree-shaking?
-clear map if no route for selected ride
- maybe add a special secret button to allow change of leader?
- miles/km still not correct when saving ride in miles - only with admin login
+
 
 -----------------------------------------------------------
 how to run client:

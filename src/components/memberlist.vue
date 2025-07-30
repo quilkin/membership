@@ -28,7 +28,7 @@ const members = ref() as Ref<Member[]>
 
 const id = ref() as Ref<number[]>;
 const fname = ref() as Ref<string[]>;
-const name = ref() as Ref<string[]>;
+const surname = ref() as Ref<string[]>;
 const paidDate = ref() as Ref<string[]>;
 const orderBy = ref('number');
 
@@ -49,7 +49,7 @@ function initialiseArrays() {
   members.value =         [] as Member[];
   id.value =   [] as number[];
   fname.value =   [] as string[];
-  name.value =   [] as string[];
+  surname.value =   [] as string[];
   paidDate.value =[] as string[];
 
 }
@@ -85,6 +85,9 @@ async function getData() {
             member.commArray= memArray;
           }
         }
+        if (member.nextOfKin == null) member.nextOfKin = '';
+        if (member.nokPhone == null) member.nokPhone = '';
+
 
     });
 
@@ -163,7 +166,7 @@ async function changeOrder(order: string) {
           <v-radio-group class="pa-1" inline v-model="orderBy">
             <v-radio label='Number' value="number" @click="changeOrder('number')" />
             <v-radio label='First Name' value="fname" @click="changeOrder('fname')"  />
-            <v-radio label='Surname' value="name" @click="changeOrder('name')"  />
+            <v-radio label='Surname' value="surname" @click="changeOrder('surname')"  />
             <v-radio label='Paid date' value="paidDate" @click="changeOrder('paidDate')"  />
           </v-radio-group>
         </v-col>

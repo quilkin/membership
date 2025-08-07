@@ -13,27 +13,25 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
     member : Member ,
      }>();
 
-  const emit = defineEmits(['logIn','detailsDone','editMember']);
+  const emit = defineEmits(['detailsDone','editMember']);
   const detailsActive = ref(false);
   const member = props.member;
   const rideHubLogin = ref('');
+  const loginColour = ref('black');
  
-
-  // // possible texts for the 'join' button
-  // const joinText = 'Join';
-  // let buttonText = joinText;
-
 /**
- *  find the ridehub login name here
+ *  find the ridehub login name 
  */
   async function getLogIn() {
     detailsActive.value = true;
     const logins: User[]   = await myFetch(apiMethods.findLoginName,member.email);
     let login0: User= logins[0];
     if (login0 == undefined) {
-       rideHubLogin.value = 'not found';
-      AlertError('Email mismatch?',`Member's email (${member.email}) not found in RideHub database`);
-      detailsActive.value = true;
+       rideHubLogin.value = `Email mismatch? Member's email (${member.email}) not found in RideHub database`;
+       loginColour.value = 'red';
+     //  alert(`Email mismatch? Member's email (${member.email}) not found in RideHub database`);
+     //   await AlertError('Email mismatch?',`Member's email (${member.email}) not found in RideHub database`);
+
     }
     else
       rideHubLogin.value = login0.name;
@@ -43,7 +41,7 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
 
   function editMember() {
         emit('editMember',member);
-        detailsActive.value = false;
+        closeDetails();
   }
   function fullName() : string {
 
@@ -63,11 +61,13 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
  }
 
  function committeeList() : string {
-
-
   if (member.commArray != undefined)
     return member.committee;
   return 'no';
+ }
+
+ function closeDetails() {
+    detailsActive.value = false;
  }
 
 
@@ -104,11 +104,11 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
 
          <v-card-actions>
             <v-btn 
-                variant="elevated" color="green" id="edit" @click="editMember()" @done-member-edit = "detailsActive = false"
+                variant="elevated" color="green" id="edit" @click="editMember()" @done-member-edit = "closeDetails()"
                 > Edit</v-btn>
 
             <v-col class="text-right">
-                <v-btn variant="outlined" text="OK" color="blue" @click="detailsActive = false"></v-btn>
+                <v-btn variant="outlined" text="OK" color="blue" @click="closeDetails()"></v-btn>
             </v-col>
         </v-card-actions>
     </v-card>

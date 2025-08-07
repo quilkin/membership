@@ -2,7 +2,7 @@
 
   const props = defineProps<{ 
     title : string,
-    info: string
+    info: string,
 
     }>();
 const emit = defineEmits(['clicked']);
@@ -14,7 +14,7 @@ const emit = defineEmits(['clicked']);
                 <v-chip class="mt-3">{{title}}</v-chip>
             </v-col>
             <v-col cols="6" class="mt-n4">
-                <v-card-text @click= "emit('clicked')"> {{info}}  </v-card-text>
+                <v-card-text @click= "emit('clicked')" > {{info}}   </v-card-text>
             </v-col>
         </v-row>
 </template>

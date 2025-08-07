@@ -193,8 +193,6 @@ async function changeOrder(order: string) {
         <v-col  cols="3" sm="2">
           <MemberDetails
             :member="member" 
-            :user="props.user"
-            @log-in="$emit('logIn')"
             @edit-member="emit('editMember',member)"
           > </MemberDetails>
 

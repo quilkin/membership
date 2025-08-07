@@ -83,7 +83,7 @@ async function doneLogin(user : User) {
       onCommittee.value = true;
   }
   if (currentMember.value.number == 0) {
-    AlertError("Member not found in database","Either you're not a paid-up TCC member, or the enmail used for RideHub is not the same as the one in the membership list. Please contact the membership secretary")
+    AlertError("Member not found in database","Either you're not a paid-up TCC member, or the enmail used for RideHub is not the same as the one in the membership list. Please contact the membership secretary: membership@truro.cc")
     return;
   }
   // now we definately know the member, force update of edit page 

@@ -23,7 +23,7 @@ const currentUser = ref(new User('',''));
 const currentMember = ref(new Member());
 const editing = ref(false);
 const memberListChanged = ref(0);
-const onCommittee = ref(true);
+const fullAccess = ref(true);
 const editKey = ref(0);
 
 import { useDisplay } from 'vuetify'
@@ -69,7 +69,7 @@ async function doneLogin(user : User) {
     return;
 
   currentUser.value = user;   // Ridehub username
-  onCommittee.value = false;
+  fullAccess.value = false;
   // find if user is on the committee
   const res = await myFetch(apiMethods.findMember,user.email);
   if (res.length > 1) {
@@ -79,8 +79,8 @@ async function doneLogin(user : User) {
   if (res.length == 1) {
     currentMember.value = res[0];
     const commttee = currentMember.value.committee.toLowerCase();
-    if (commttee.includes('membership') || commttee.includes('chair'))
-      onCommittee.value = true;
+    if (commttee.includes('memberlist') )
+      fullAccess.value = true;
   }
   if (currentMember.value.number == 0) {
     AlertError("Member not found in database","Either you're not a paid-up TCC member, or the enmail used for RideHub is not the same as the one in the membership list. Please contact the membership secretary: membership@truro.cc")
@@ -89,7 +89,7 @@ async function doneLogin(user : User) {
   // now we definately know the member, force update of edit page 
   editKey.value += 1;
 
-  if (onCommittee.value)
+  if (fullAccess.value)
     // only these can see everything
     switchTab(Tabs.members);
   else // can just edit themselves 
@@ -174,15 +174,15 @@ const tabWidth= computed(() => {
       :grow="mobile===false"
       @update:model-value="tabChanged"
       >
-      <v-tab v-if="onCommittee" :value=Tabs.members :style="{...tabWidth}" @click="calendarClicked">  <v-icon :icon="mdiAccountMultiple"/> Members</v-tab>
+      <v-tab v-if="fullAccess" :value=Tabs.members :style="{...tabWidth}" @click="calendarClicked">  <v-icon :icon="mdiAccountMultiple"/> Members</v-tab>
       <v-tab :value=Tabs.newMember :style="{...tabWidth}">   <v-icon :icon="mdiAccountPlus"/> Edit/New member</v-tab>
-      <v-tab v-if="onCommittee" :value=Tabs.account :style="{...tabWidth}">    <v-icon :icon="mdiAccountEdit"/>  Account</v-tab>
-      <v-tab v-if="onCommittee" :value=Tabs.stats :style="{...tabWidth}">    <v-icon :icon="mdiFormatListNumberedRtl"/>        Stats</v-tab>
+      <v-tab v-if="fullAccess" :value=Tabs.account :style="{...tabWidth}">    <v-icon :icon="mdiAccountEdit"/>  Account</v-tab>
+      <v-tab v-if="fullAccess" :value=Tabs.stats :style="{...tabWidth}">    <v-icon :icon="mdiFormatListNumberedRtl"/>        Stats</v-tab>
 
     </v-tabs>
 
       <v-window v-model="currentTab">
-        <v-window-item  v-if="onCommittee" :value=Tabs.members>
+        <v-window-item  v-if="fullAccess" :value=Tabs.members>
           <v-container >
                 <MemberList
                  :key = "memberListChanged"
@@ -201,7 +201,7 @@ const tabWidth= computed(() => {
                 <MemberEdit v-if="checkLogIn() && editing"
                 :key = "editKey"
                 :member="currentMember"
-                :onCommittee="onCommittee"
+                :onCommittee="fullAccess"
                 @log-in="logIn"
                 @done-member-edit="doneMemberEdit"
 
@@ -211,7 +211,7 @@ const tabWidth= computed(() => {
         </v-window-item>
         
 
-        <v-window-item  v-if="onCommittee" :value=Tabs.account>
+        <v-window-item  v-if="fullAccess" :value=Tabs.account>
           <v-container  class=" scrollable">
             <account-actions 
               :user="currentUser"
@@ -222,7 +222,7 @@ const tabWidth= computed(() => {
         </v-container>
         </v-window-item>
 
-        <v-window-item  v-if="onCommittee":value=Tabs.stats>
+        <v-window-item  v-if="fullAccess":value=Tabs.stats>
           <v-container  class="">
             <Stats
             :user="currentUser"

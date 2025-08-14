@@ -1,4 +1,6 @@
-
+full access defined by new committee word
+send csv file for membership list
+send csv file for action list
 
 -----------------------------------------------------------
 how to run client:

@@ -12,6 +12,7 @@ import MemberDetails from './memberDetails.vue'
 import { AlertError, Message, YesNo } from '../utils/alert'
 import '@vuepic/vue-datepicker/dist/main.css';
 import { useDisplay } from 'vuetify'
+import { mdiDownload} from '@mdi/js'
 const { mobile } = useDisplay();
 
 const props = defineProps<{
@@ -85,8 +86,8 @@ async function getData() {
             member.commArray= memArray;
           }
         }
-        if (member.nextOfKin == null) member.nextOfKin = '';
-        if (member.nokPhone == null) member.nokPhone = '';
+        if (member.nextOfKin == null) member.nextOfKin = 'unknown';
+        if (member.nokPhone == null) member.nokPhone = '?';
 
 
     });
@@ -154,6 +155,33 @@ async function changeOrder(order: string) {
   await getData();
 }
 
+function download() {
+  let csvContent = "data:text/csv;charset=utf-8,";
+  
+  members.value.forEach(function(member: Member) {
+      const values=Object.values(member);
+      // don't want commas in csv file
+
+      for (let i = 0; i < values.length; i++) {
+        const val = values[i];
+        if (typeof val === 'string' && val.includes(','))
+          values[i] = val.replace(/,/gi, " ");
+      }
+
+      let row = values.join(",");
+      csvContent += row + "\r\n";
+  });
+  var encodedUri = encodeURI(csvContent);
+  var link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  let filename = "TCC members ";
+  filename += new Date().toDateString();
+  filename += ".csv";
+  link.setAttribute("download", filename);
+  document.body.appendChild(link); // Required for FF
+
+  link.click(); // This will download the data file.
+}
 
 </script>
 
@@ -162,13 +190,17 @@ async function changeOrder(order: string) {
         <v-col cols="2">
           <v-card-text>Order member list by: </v-card-text>
         </v-col>
-        <v-col cols="10">
+        <v-col cols="8">
           <v-radio-group class="pa-1" inline v-model="orderBy">
             <v-radio label='Number' value="number" @click="changeOrder('number')" />
             <v-radio label='First Name' value="fname" @click="changeOrder('fname')"  />
             <v-radio label='Surname' value="surname" @click="changeOrder('surname')"  />
             <v-radio label='Paid date' value="paidDate" @click="changeOrder('paidDate')"  />
           </v-radio-group>
+        </v-col>
+        <v-col cols = "2">
+          <v-btn block   @click="download()" :prepend-icon="mdiDownload"> 
+                Download CSV list</v-btn>
         </v-col>
     </v-row>
   <v-container >
@@ -192,7 +224,7 @@ async function changeOrder(order: string) {
 
         <v-col  cols="3" sm="2">
           <MemberDetails
-            :member="member" 
+            :member=member 
             @edit-member="emit('editMember',member)"
           > </MemberDetails>
 

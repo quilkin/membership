@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref , onMounted, onBeforeMount} from 'vue'
+  import { ref , onMounted, onUpdated} from 'vue'
   import { Member } from '../../../membership-server/src/common/member'
    import { User, Roles } from '../../../membership-server/src/common/user'
   //import { User } from '../utils/user'
@@ -15,9 +15,14 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
 
   const emit = defineEmits(['detailsDone','editMember']);
   const detailsActive = ref(false);
-  const member = props.member;
+  let member = props.member;
   const rideHubLogin = ref('');
   const loginColour = ref('black');
+
+  onUpdated(() => {
+
+    member = props.member
+  })
  
 /**
  *  find the ridehub login name 
@@ -76,7 +81,7 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
 <template>
   <div class="text-center">
     <v-btn size="small"  variant='outlined'  color="green" :prepend-icon="mdiAccount" width="110" @click="getLogIn()">
-        Details
+        Details 
     </v-btn>
     
       <v-dialog 

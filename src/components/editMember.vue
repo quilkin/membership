@@ -66,7 +66,7 @@ onBeforeMount(async() => {
   }
   if (props.onCommittee)
     fullEdit.value = true;
-  console.log('OnBeforeMount: '+props.member.email);
+ // console.log('OnBeforeMount: '+props.member.email);
   update();
   thisMember = props.member;
 })
@@ -75,7 +75,7 @@ onBeforeUpdate(async() => {
 
   if (props.onCommittee)
     fullEdit.value = true;
-   console.log('OnBeforeUpdate: '+props.member.committee);
+  // console.log('OnBeforeUpdate: '+props.member.committee);
   update();
     thisMember = props.member;
   if (props.member.number> 0) {

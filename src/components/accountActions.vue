@@ -5,7 +5,7 @@
  */
 import { ref, onMounted, onUpdated,  onBeforeMount } from 'vue'
 import login from './account/login.vue'
-import account from './account/account.vue'
+//import account from './account/account.vue'
 import { User, Roles} from '../../../membership-server/src/common/user'
 
 
@@ -75,10 +75,10 @@ function doneAccount() {
             @logged-in="loggedIn"
             ></login>
 
-    <account v-else
+    <!-- <account v-else
             :user="currentUser"
             @done-account="doneAccount"
             @logout="emit('logout')"
-    ></account>
+    ></account> -->
 </template>
 

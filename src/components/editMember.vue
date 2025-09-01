@@ -9,7 +9,6 @@ import { nameRules, genderRules, subsRules, emailRules,addressRules } from '../u
 import { myFetch } from '@/utils/fetch'
 import { apiMethods } from '../../../membership-server/src/common/apimethods'
 import { Member } from '../../../membership-server/src/common/member'
-import { User, Roles  } from '../../../membership-server/src/common/user'
 import { Alert, Message, YesNo, AlertError } from '../utils/alert'
 import DateSelector  from './dateSelector.vue'
 
@@ -19,6 +18,8 @@ const fname = ref('');
 const surname = ref('');
 const subs = ref(20);
 const paidDate = ref(new Date());
+const nowDate = ref(new Date());
+const joinedDate = ref(new Date());
 const dateChanged = ref(false);
 const gender = ref('');
 const address1 = ref ('');
@@ -36,7 +37,8 @@ const nokPhone = ref('');
 
 // controls
 const showDate = ref(0);
-const calendarShown = ref(false);
+const PayCalendarShown = ref(false);
+const joinCalendarShown = ref(false);
 
 let newMember = true;     // false for editing an existing one
 
@@ -46,7 +48,7 @@ const memberDialog = ref(false);
 
 const emit = defineEmits(['doneMemberEdit','logIn']);
 const memberForm = ref();
-const date = ref(new Date());
+
 const fullEdit = ref(false);
 
 const props = defineProps<{
@@ -106,6 +108,7 @@ function update() {
     surname.value = thisMember.surname;
    gender.value = thisMember.gender;
     paidDate.value = thisMember.paidDate;
+     joinedDate.value = thisMember.joinedDate;
     subs.value = thisMember.subs;
     telephone.value = thisMember.phone;
     email.value = thisMember.email;
@@ -168,6 +171,7 @@ async function submit() {
       thisMember.gender = gender.value  ;
       if (dateChanged.value)
         thisMember.paidDate = paidDate.value;
+      thisMember.joinedDate = joinedDate.value;
       thisMember.subs = subs.value;
       thisMember.phone = telephone.value ;
       thisMember.email = email.value ;
@@ -209,6 +213,10 @@ async function submit() {
         return;
       if (res=="OK") {
         await Message('Edited member has been saved');
+        if (props.onCommittee==false) {
+          // close wwindow so that ridehub appears again
+          window.close();
+        }
       }
       else {
         await AlertError('Save Member Error',res);
@@ -221,9 +229,13 @@ async function submit() {
 
 }
 
-function newDate(newDate : Date) {
+function newPayDate(newDate : Date) {
   paidDate.value = newDate;
   dateChanged.value = true;
+}
+function newJoinDate(newDate : Date) {
+  joinedDate.value = newDate;
+
 }
 </script>
 
@@ -347,17 +359,26 @@ function newDate(newDate : Date) {
                 Paid date
               </v-col> -->
               <v-col cols="2" >
-                <v-btn  color="green"   @click="calendarShown=!calendarShown">Edit paydate</v-btn>
+                <v-btn  color="green"   @click="PayCalendarShown=!PayCalendarShown">Edit paydate</v-btn>
               </v-col>
 
-              <v-col cols="2" v-if="calendarShown">
+              <v-col cols="3" v-if="PayCalendarShown">
+                    <DateSelector :icon="false" 
+                      :key="showDate"
+                      :text="nowDate.toDateString()"
+                      :date="nowDate"
+                      @new-date="newPayDate"   />
+              </v-col>
+              <v-col cols="2">
+                <v-btn  color="green"   @click="joinCalendarShown=!joinCalendarShown">Edit joining date</v-btn>
+              </v-col>
+              <v-col cols="3"  v-if="joinCalendarShown">
                     <DateSelector :icon="false" 
                     :key="showDate"
-                      :text="date.toDateString()"
-                      :date="date"
-                      @new-date="newDate"   />
+                      :text="nowDate.toDateString()"
+                      :date="nowDate"
+                      @new-date="newJoinDate"   />
               </v-col>
-              <v-col cols="5"></v-col>
             </v-row>
           <!-- </v-container> -->
           </div>

@@ -9,10 +9,11 @@ import { apiMethods } from '../../../membership-server/src/common/apimethods'
 import { Member } from '../../../membership-server/src/common/member'
 import { User, Roles } from '../../../membership-server/src/common/user'
 import MemberDetails from './memberDetails.vue'
+import EMail from './email.vue'
 import { AlertError, Message, YesNo } from '../utils/alert'
 import '@vuepic/vue-datepicker/dist/main.css';
 import { useDisplay } from 'vuetify'
-import { mdiDownload} from '@mdi/js'
+import { mdiDownload, mdiEmailEdit} from '@mdi/js'
 const { mobile } = useDisplay();
 
 const props = defineProps<{
@@ -164,9 +165,24 @@ function download() {
 
       for (let i = 0; i < values.length; i++) {
         const val = values[i];
-        if (typeof val === 'string' && val.includes(','))
-          values[i] = val.replace(/,/gi, " ");
+        if (typeof val === 'string')
+        { 
+          if (val.includes(','))
+            values[i] = val.replace(/,/gi, " ");
+          if (val.includes('000Z'))
+          // date/time, don't need time part
+            values[i] = val.substring(0,10);
+          if (val.includes('GMT+'))
+            // date/time, don't need time part
+            values[i] = val.substring(4,15);
+          if (val.includes('00:00:00'))
+            // date/time, not recognised
+            values[i] = 'unknown';
+        }
       }
+
+
+
 
       let row = values.join(",");
       csvContent += row + "\r\n";
@@ -186,10 +202,10 @@ function download() {
 </script>
 
 <template>
+    <v-row no-gutters>
+        <v-card-text>Order member list by: </v-card-text>
+    </v-row>
       <v-row no-gutters>
-        <v-col cols="2">
-          <v-card-text>Order member list by: </v-card-text>
-        </v-col>
         <v-col cols="8">
           <v-radio-group class="pa-1" inline v-model="orderBy">
             <v-radio label='Number' value="number" @click="changeOrder('number')" />
@@ -198,9 +214,14 @@ function download() {
             <v-radio label='Paid date' value="paidDate" @click="changeOrder('paidDate')"  />
           </v-radio-group>
         </v-col>
-        <v-col cols = "2">
+        <v-col cols = "2" class="pa-1">
           <v-btn block   @click="download()" :prepend-icon="mdiDownload"> 
                 Download CSV list</v-btn>
+        </v-col>
+        <v-col cols = "2"  class="pa-1">
+          <EMail
+          :user  = props.user
+          > </EMail>
         </v-col>
     </v-row>
   <v-container >

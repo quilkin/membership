@@ -1,6 +1,13 @@
-# ridehub
+# membership
 
-This template should help get you started developing with Vue 3 in Vite.
+Client-side code for updating Truro Cycling Club's membership list. 
+Written entrirely in Typescript, using the [Vue3](https://vuejs.org/)  and [Vuetify](https://vuetifyjs.com/en/) frameworks.
+See [Membership-server](https://github.com/quilkin/membership-server) for the server side, including database info.
+
+# development
+
+Development details below were auto-created by Vue 3 when the project started.
+They should help get you started developing with Vue 3 in Vite, but may have become out-of-date as the project progressed and (tools are always being updated)
 
 ## Recommended IDE Setup
 

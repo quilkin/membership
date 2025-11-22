@@ -5,7 +5,7 @@
  * Create a new member or edit an existing one
  */
 import { ref, type Ref, onBeforeMount, onMounted, onBeforeUpdate} from 'vue'
-import { nameRules, genderRules, subsRules, emailRules,addressRules } from '../utils/rules'
+import { nameRules, genderRules, subsRules, emailRules,addressRules, phoneRules } from '../utils/rules'
 import { myFetch } from '@/utils/fetch'
 import { apiMethods } from '../../../membership-server/src/common/apimethods'
 import { Member } from '../../../membership-server/src/common/member'
@@ -82,9 +82,10 @@ onBeforeUpdate(async() => {
     thisMember = props.member;
   if (props.member.number> 0) {
     // editing existing ride
-
     newMember = false;
   }
+  else
+    newMember = true;
 })
 
 /**
@@ -188,10 +189,10 @@ async function submit() {
                 commString += p;
                 commString += ' ';
             }
-           thisMember.committee= commString;
+           
           }
       }
-      
+      thisMember.committee= commString;
 
      if (newMember) {
       thisMember.joinedDate = new Date();
@@ -268,7 +269,7 @@ function newJoinDate(newDate : Date) {
                    :rules="nameRules"
                    hint=""/>
               </v-col>
-              <v-col cols="2"  >
+              <v-col  v-if="fullEdit" cols="2"  >
                   <v-text-field density="compact"   variant="outlined" label="Gender" 
                    v-model="gender"
                    :rules="genderRules"
@@ -286,25 +287,27 @@ function newJoinDate(newDate : Date) {
                 <v-row>
                   <v-text-field density="compact"   variant="outlined" label="Address3"   v-model= "address3"/>
                 </v-row>
+              </v-col>
+              <v-col cols="5"  class="ml-3 mr-3" >
                 <v-row>
                   <v-text-field density="compact"  :rules="addressRules"  variant="outlined" label="Postcode"   v-model= "postcode"/>
                 </v-row>
                 <v-row>
-                  <v-text-field density="compact"   variant="outlined" label="Telephone"   v-model= "telephone"/>
+                  <v-text-field density="compact"   :rules="phoneRules" variant="outlined" label="Telephone"   v-model= "telephone"/>
                 </v-row>
                 <v-row>
                   <v-text-field density="compact"   :rules="emailRules"  variant="outlined" label="Email"   v-model= "email"/>
                 </v-row>
               </v-col>
-              <v-col cols="5" class="ml-3 mr-3" >
- 
-                <v-row v-if="fullEdit">                  Committee position(s):</v-row>
-                <v-row v-if="fullEdit">
+            </v-row>
+            <v-row v-if="fullEdit">                  Committee position(s):</v-row>
+            <v-row v-if="fullEdit">
                   <v-col cols="6">
                     <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Secretary" value="secretary"></v-checkbox>
                     <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Chair" value="chair"></v-checkbox>
                     <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Membership" value="membership"></v-checkbox>
                     <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Social" value="social"></v-checkbox>
+                    <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Edit Members?" value="memberlist"></v-checkbox>
                   </v-col>
                   <v-col cols="6">
                     <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Racing" value="racing"></v-checkbox>
@@ -312,67 +315,71 @@ function newJoinDate(newDate : Date) {
                     <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Marketing" value="marketing"></v-checkbox>
                     <v-checkbox class="mt-n6" v-model="commArray" hide-details label="Non-Exec" value="nonexec"></v-checkbox>
                   </v-col>
-                </v-row>
-                <v-row>
+            </v-row>
+            <v-row>
                   <v-card-subtitle>
-                     Emergency contact details can also be seen by other members that are on a ride that you are on, 
+                     Emergency contact details can also be seen by other
                   </v-card-subtitle>
                   <v-card-subtitle>
-                     in case of an accident - but only on the day of that ride.
+                      members that are on a ride that you are on, in case 
                   </v-card-subtitle>
-
-                </v-row>
-                <v-row>
-                  <v-text-field class="mt-6" density="compact"   variant="outlined" label="Emergency contact"  v-model= "nextOfKin"/>
-                </v-row>
-                <v-row>
+                  <v-card-subtitle>
+                     of an accident - <b>but only on the day of that ride.</b>
+                  </v-card-subtitle>
+            </v-row>
+            <v-row>
+                <v-col cols="6">
+                  <v-text-field density="compact"   variant="outlined" label="Emergency contact"  v-model= "nextOfKin"/>
+                </v-col>
+                <v-col cols="6">
                   <v-text-field density="compact"   variant="outlined" label="Contact's phone" v-model= "nokPhone"/>
-                </v-row>
-              </v-col>
+                </v-col>
+             
             </v-row>
 
           <v-row  v-if="fullEdit">
-            <v-col cols="6">
-              WhatsApp groups (Committee group defined by committee position):
-            </v-col>
-           
-            <v-col>
+            <v-card-subtitle>
+              WhatsApp groups :
+            </v-card-subtitle>
+          </v-row>
+          <v-row v-if="fullEdit">
+            <v-col cols="4">
               <v-checkbox  v-model="waChat" label ='Chat group' hide-details/>
             </v-col>
-            <v-col>
+            <v-col cols="4">
               <v-checkbox  v-model="waInfo" label ='Info group' hide-details/>
             </v-col>
-            <v-col>
+            <v-col cols="4">
               <v-checkbox  v-model="waLeisure" label ='Leisure group' hide-details/>
             </v-col>
-            
           </v-row>
 
           <v-row  v-if="fullEdit">
-              <v-col cols="3"   >
-                  <v-text-field density="compact" variant="outlined" label="Subscription amount (£)" 
+              <v-col cols="4"   >
+                  <v-text-field density="compact" variant="outlined" label="Subs paid(£)" 
                     v-model="subs"
                     :rules="subsRules"
                     hint='Annual subs in £'/>
               </v-col>
-              <!-- <v-col cols="1" offset = 2  v-if="calendarShown">
-                Paid date
-              </v-col> -->
-              <v-col cols="2" >
+
+              <v-col cols="3" >
                 <v-btn  color="green"   @click="PayCalendarShown=!PayCalendarShown">Edit paydate</v-btn>
               </v-col>
 
-              <v-col cols="3" v-if="PayCalendarShown">
+              <v-col cols="5" v-if="PayCalendarShown">
                     <DateSelector :icon="false" 
                       :key="showDate"
                       :text="nowDate.toDateString()"
                       :date="nowDate"
                       @new-date="newPayDate"   />
               </v-col>
-              <v-col cols="2">
+            </v-row>
+            <v-row v-if="fullEdit">
+              <v-col cols="3"></v-col>
+              <v-col cols="3">
                 <v-btn  color="green"   @click="joinCalendarShown=!joinCalendarShown">Edit joining date</v-btn>
               </v-col>
-              <v-col cols="3"  v-if="joinCalendarShown">
+              <v-col cols="5"  v-if="joinCalendarShown">
                     <DateSelector :icon="false" 
                     :key="showDate"
                       :text="nowDate.toDateString()"
@@ -391,7 +398,8 @@ function newJoinDate(newDate : Date) {
               <v-btn block color="green"  variant="outlined" @click="cancel()" >Cancel Edit</v-btn>
             </v-col>
             <v-col >
-              <v-btn v-if="thisMember.email.length > 0" block color="green" type="submit"  >Save Member</v-btn>
+              <v-btn v-if="thisMember.email.length > 0" block color="green" type="submit"  >Save Details</v-btn>
+              <v-btn v-if="thisMember.email.length == 0" block color="green" type="submit"  >Save Member</v-btn>
             </v-col>
 
           </v-row>

@@ -43,6 +43,13 @@ export const emailRules = [
                             return 'E-mail must be a valid address.'
                             },
                         ];
+export const phoneRules = [ 
+                            (value: string) => !!value || 'Required.', 
+                            (value: string) => {
+                            if (value.length >= 9) return true
+                                return 'phone is min 9 characters.'
+                                },
+                            ];
 export const subsRules = [ 
                             (value: number) => !!value || 'Required.', 
                             (value: number) => {
